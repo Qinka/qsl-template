@@ -1,0 +1,25 @@
+\documentclass{qsl}
+
+% For shadow of text
+\usepackage{bidicontour}
+\usepackage{bidi}
+
+% stretch
+\usepackage{setspace}
+
+\graphicspath{{./images}}
+\begin{document}
+
+    \callsign{BI3TTR}
+    \cq{24}
+    \itu{44}
+	\addr{陕西省西安市西沣路兴隆段266号}
+	\pc{710126}
+
+    \begin{card}[angle=90]{王诤}
+            \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \Huge \bfseries
+            \setstretch{1} \vfill \hfill
+            \rotatebox{90}{\vspace{-2em}\bidicontour{white}{\de}}
+    \end{card}
+
+\end{document}
