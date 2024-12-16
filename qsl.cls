@@ -80,14 +80,16 @@
 
 
 \NewDocumentEnvironment{card}{ O{} m +b}{ %
+        \newgeometry{left=10mm, right=10mm, top=10mm, bottom=10mm}
         \clearpage \thispagestyle{empty}
         \begin{front}[#1]{#2}
             #3
         \end{front}
+        \restoregeometry
         \clearpage \thispagestyle{empty}
         \newgeometry{left=4mm, right=4mm, top=4mm, bottom=4mm}
-            \begin{back}
-            \end{back}
+        \begin{back}
+        \end{back}
         \restoregeometry
 }
 

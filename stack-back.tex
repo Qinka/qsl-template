@@ -1,0 +1,23 @@
+\documentclass[a4paper]{article}
+
+\usepackage[left=5mm, right=5mm, bottom=5mm, top=5mm]{geometry}
+\usepackage{graphicx}
+
+\def\vhbox#1#2{\fbox{\vbox{\vspace*{#1}}\hbox{\hspace*{#2}}}}
+
+\begin{document}
+    \setlength{\fboxrule}{1pt}
+    \setlength{\fboxsep}{-1pt}
+    \centering
+    \vhbox{133.5mm}{89mm}
+    \vhbox{133.5mm}{89mm} \\
+    \vhbox{133.5mm}{89mm}
+    \vhbox{133.5mm}{89mm} \\
+
+    \includegraphics[angle=-90,page=2]{card.pdf}
+    \includegraphics[angle=-90,page=4]{card.pdf} \\
+    \includegraphics[angle=-90,page=6]{card.pdf}
+    \includegraphics[angle=-90,page=8]{card.pdf}
+
+
+\end{document}
