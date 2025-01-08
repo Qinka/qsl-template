@@ -21,7 +21,7 @@
 \str_new:N\g_@callsign@cn
 \str_new:N\g_@callsign@en
 \str_set:Nn\g_@title@cn{中华人民共和国个人业余电台}
-\str_set:Nn\g_@title@en{Personal Amateur Radio Station of P.R.China}
+\str_set:Nn\g_@title@en{Personal~Amateur~Radio~Station~of~P.R.China}
 
 \DeclareDocumentCommand\callsign{m}{\str_set:Nn \g_@callsign {#1}}
 \DeclareDocumentCommand\cq{m}{\str_set:Nn \g_@cq {#1}}
