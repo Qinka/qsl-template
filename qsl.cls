@@ -92,19 +92,18 @@
 }
 
 \cs_new:Nn \card_part_@swl_info: {
-    \begin{tabular}{| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}| m{44mm}<{\centering}|}
+    \begin{tabular}{| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}|}
         \hline
-        {\footnotesize DATE/日期} & {\footnotesize TIME/时间} & { \small  MHZ/频率 } & {\footnotesize MOD/模式}  \\ \hline
-        & & & \\
-        & & & \\\hline
-        {\footnotesize TRX/设备} & {\footnotesize WATTS/功率} & {\footnotesize ANT/天线} & \multicolumn{1}{l|}{\multirow{2}{*}{%
-            % $\Box$ \vbox{\hbox{TRX~UR~ LISTEN}\vspace{2mm}\hbox{感谢您的收听}}
+        {\footnotesize DATE/日期} & {\footnotesize TIME/时间} & { \small  MHZ/频率 } & {\footnotesize MOD/模式} & {\footnotesize  RST/信号报告} \\ \hline
+        & & & & \\
+        & & & & \\\hline
+        {\footnotesize TRX/设备} & {\footnotesize WATTS/功率} & {\footnotesize ANT/天线} & \multicolumn{2}{l|}{\multirow{2}{*}{
             $\Box$ \parbox{44mm}{TRX~UR~ FOR~LISTENING \vspace{-1.5mm}\\  感谢您的收听} %
         }} \\ \cline{1-3}
-        &  &  & \\ \cline{4-4}
-        &  &  &  \multicolumn{1}{l|}{ $\Box$  VY~73!/通联愉快！ } \\ \hline
-        \multicolumn{4}{l}{\bfseries QTH:} \\
-        \multicolumn{4}{l}{\bfseries ADD:~\g_@addr} \\
+        &  &  & \multicolumn{2}{l|}{  }  \\ \cline{4-5}
+        &  &  &  \multicolumn{2}{l|}{ $\Box$  VY~73!/通联愉快！ } \\ \hline
+        \multicolumn{5}{l}{\bfseries QTH:} \\
+        \multicolumn{5}{l}{\bfseries ADD:~\g_@addr} \\
         \multicolumn{3}{l}{\bfseries \quad PC:~\g_@pc} & \multicolumn{1}{l}{ \bfseries OP:} \\
     \end{tabular}
 }
