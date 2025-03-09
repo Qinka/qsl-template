@@ -57,9 +57,9 @@
 }
 
 \cs_new:Nn \card_part_@callsign: {
-    \begin{tabular}{m{20mm}m{55mm}<{\centering}|m{39mm}<{\centering}|}
+    \begin{tabular}{m{16mm}m{59mm}<{\centering}|m{39mm}<{\centering}|}
         \cline{3-3}
-        \parbox{20mm}{}& \multirow{2}{*}{\Huge \bfseries \g_@callsign}& \multirow{2}{*}{\footnotesize \scshape \itshape To~Radio \vspace{.7cm}} \\
+        & \multirow{2}{*}{\Huge \bfseries \g_@callsign}& \multirow{2}{*}{\footnotesize \scshape \itshape To~Radio \vspace{.7cm}} \\
         & & \\ \cline{3-3}
     \end{tabular}
 }
