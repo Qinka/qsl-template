@@ -1,7 +1,10 @@
 
-\RequirePackage{expl3,l3keys2e,xparse,trace}
-\ProvidesExplClass{qsl}{2024/10/14}{0.2.0}{ QSL Card template}
-\LoadClass[10pt]{ctexart}
+\RequirePackage{expl3}
+\ProvidesExplClass{qsl}{2024/10/14}{0.3.0}{ QSL Card template}
+\LoadClass[10pt,fontset=windows]{ctexart}
+
+\RequirePackage{l3keys2e}
+\RequirePackage{trace}
 
 \RequirePackage{xparse}
 \RequirePackage{array}
@@ -11,158 +14,172 @@
 \RequirePackage{amssymb}
 \RequirePackage{geometry}
 
+\usetikzlibrary{shapes.arrows}
+
 \setlength{\parindent}{0pt}
-\geometry{paperheight=89mm, paperwidth=133.5mm, left=10mm, right=10mm, top=10mm, bottom=10mm}
+\geometry{paperheight=89mm, paperwidth=127mm, left=10mm, right=10mm, top=10mm, bottom=10mm}
 
 
-\str_new:N\g_@addr
-\str_new:N\g_@pc
-\str_new:N\g_@title
-\str_new:N\g_@callsign@cn
-\str_new:N\g_@callsign@en
-\str_set:Nn\g_@title@cn{中华人民共和国个人业余电台}
-\str_set:Nn\g_@title@en{Personal~Amateur~Radio~Station~of~P.R.China}
+% 正面图案
+\cs_new:Npn \g_cover_image:nn #1#2 {
+    \tl_if_empty:nTF {#2} {
+        \relax
+    }{
+        \begin{tikzpicture}[overlay,remember~picture]
+            \node(1) at (current~page.center) { \resizebox{133.5mm}{89mm}{\includegraphics[#1]{#2}}};
+        \end{tikzpicture}
+    }
+}
 
-\DeclareDocumentCommand\callsign{m}{\str_set:Nn \g_@callsign {#1}}
-\DeclareDocumentCommand\cq{m}{\str_set:Nn \g_@cq {#1}}
-\DeclareDocumentCommand\itu{m}{\str_set:Nn \g_@itu {#1}}
-\DeclareDocumentCommand\addr{m}{\str_set:Nn \g_@addr {#1}}
-\DeclareDocumentCommand\pc{m}{\str_set:Nn \g_@pc {#1}}
-\DeclareDocumentCommand\title{m m}{\str_set:Nn \g_@title@cn {#1} \str_set:Nn \g_@title@en {#2}}
-
-\DeclareDocumentCommand\de{}{DE~\g_@callsign}
-
-
-\DeclareDocumentEnvironment{front}{ O{} m +b}{ %
-    \begin{tikzpicture}[overlay,remember~picture]
-        \node(1) at (current~page.center) { \resizebox{133.5mm}{89mm}{\includegraphics[#1]{#2}}}  ;
-    \end{tikzpicture}
+% 封面(整面图案)
+\DeclareDocumentEnvironment{front}{ O{} m +b }{
+    \g_cover_image:nn {#1}{#2}
     {#3}
 }{}
 
-\cs_new:Nn \card_part_@head: {
-    \begin{tikzpicture}[remember~picture]
-        \node(1)[xshift=-15mm,yshift=28mm] at (current~page.center) {
+% 背面 QSL 信息
+\tl_new:N \g_qsl_title_tl % 抬头
+\tl_new:N \g_qsl_callsign_tl  % 呼号
+\tl_new:N \g_qsl_cq_zone_tl %   CQ 分区
+\tl_new:N \g_qsl_itu_zone_tl %  ITU 分区
+\tl_new:N \g_qsl_grid_zone_tl % 梅登海德网格 分区
+\keys_define:nn {qsl} {
+    callsign .tl_set:N = \g_qsl_callsign_tl,
+    cq .tl_set:N = \g_qsl_cq_zone_tl,
+    itu .tl_set:N = \g_qsl_itu_zone_tl,
+    grid .tl_set:N = \g_qsl_grid_zone_tl,
+}
+\DeclareDocumentCommand{\setup} {m} {
+    \keys_set:nn {qsl} {#1}
+}
+\DeclareDocumentCommand{\title}{m O{}}{
+    \tl_set:Nn \g_qsl_title_tl {
+        \begin{minipage}{105mm} \centering
+            \begin{tabular}{c}
+                {\huge \bfseries \rmfamily  #1 } \\
+                { \large \scshape #2 } \\
+            \end{tabular}
+        \end{minipage}
+    }
+}
+\DeclareDocumentCommand{\customtitle} {m} {
+    \tl_set:Nn \g_qsl_title_tl {
+        \begin{minipage}{105mm} \centering
+            #1
+        \end{minipage}
+    }
+}
+
+% 确认来源
+\cs_new:Npn \g_qsl_checkbox:n #1 {
+    \bool_if:nTF {
+        $\checkmark$
+    } {
+        $\Box$
+    }
+}
+\cs_new:Npn \g_qsl_confirming_qsl:nnn #1 #2 #3  {
+    \bool_if:nTF {#1} {
+        \begin{tabular}{ccc}
+            {\footnotesize CONFIRMING} & { \footnotesize \g_qsl_checkbox:n{#2} OUR~QSL/我们的通联} & {\footnotesize \g_qsl_checkbox:n{#3} YOUR~RECV~RPT/您的收听}  \\
+        \end{tabular}
+    } {
+        \begin{tabular}{cc}
+            {\footnotesize CONFIRMING} &  {\footnotesize \g_qsl_checkbox:n{#3} YOUR~RECV~RPT/您的收听}  \\
+        \end{tabular}
+    }
+}
+
+% 通联信息
+\tl_new:N \l_qsl_info_date
+\tl_new:N \l_qsl_info_time
+\tl_new:N \l_qsl_info_freq
+\tl_new:N \l_qsl_info_mode
+\tl_new:N \l_qsl_info_rst
+\tl_new:N \l_qsl_info_trx
+\tl_new:N \l_qsl_info_watts
+\tl_new:N \l_qsl_info_ant
+\tl_new:N \l_qsl_target_callsign
+\cs_new:Nn \g_qsl_information: {
+    \begin{tabular}{| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}|}
+        \hline
+        {\footnotesize DATE/日期} & {\footnotesize TIME/时间} & { \small  MHZ/频率 } & {\footnotesize MOD/模式}  \\ \hline
+        \multirow{2}{22mm}{\l_qsl_info_date} & \multirow{2}{22mm}{\l_qsl_info_time} & \multirow{2}{22mm}{\l_qsl_info_freq} & \multirow{2}{22mm}{\l_qsl_info_mode} & \\
+        & & & & \\\hline
+        {\footnotesize TRX/设备} & {\footnotesize WATTS/功率} & {\footnotesize ANT/天线}& {\footnotesize  RST/信号报告}  \\ \hline
+        \multirow{2}{22mm}{\l_qsl_info_trx} & \multirow{2}{22mm}{\l_qsl_info_watts} & \multirow{2}{22mm}{\l_qsl_info_ant} & \multirow{2}{22mm}{\l_qsl_info_rst} & \\
+        & & & & \\\hline
+    \end{tabular}
+}
+% 卡片信息
+\cs_new:Npn \g_qsl_qsl: #1 #2 {
+    \begin{tabular}{l l l l l}
+        \textbf{VY} & {73!} & & GRID & \textbf{\g_qsl_grid_zone_tl}  \\
+        CQ & \textbf{\g_qsl_cq_zone_tl} & & ITU & \textbf{\g_qsl_itu_zone_tl}
+    \end{tabular}
+}
+\cs_new:Nn \g_qsl_callsign_display: {
+    {\Huge \bfseries  \g_qsl_callsign_tl}
+}
+% \cs_new:Nn
+\DeclareDocumentCommand{\back}{} {
+    \begin{tikzpicture}[overlay,remember~picture]
+        \node [anchor=north] (title) at (1, 0) {
             \includegraphics[height=22mm]{CRAC.eps}
         };
-        \node(2)[xshift=45mm,yshift=33mm] at (current~page.center) {
-            \begin{minipage}{105mm} \centering
-                \begin{tabular}{c}
-                    {\huge \bfseries \rmfamily  \g_@title@cn } \\
-                    { \large \scshape \g_@title@en } \\
-                \end{tabular}
-            \end{minipage}
+        \node[anchor=north] (title) at (6.5, 0) {
+            \resizebox{9cm}{!}{\g_qsl_title_tl}
         };
+        \node[anchor=west] (callsign) at (2.1, -1.8) {
+            \resizebox{4cm}{!}{\g_qsl_callsign_display:}
+        };
+        \draw[rounded~corners] (7,-1.3) rectangle (11, -2.2);
+        \node[single~arrow ] at (6,-3) {} ;
     \end{tikzpicture}
 }
 
-\cs_new:Nn \card_part_@callsign: {
-    \begin{tabular}{m{16mm}m{59mm}<{\centering}|m{39mm}<{\centering}|}
-        \cline{3-3}
-        & \multirow{2}{*}{\Huge \bfseries \g_@callsign}& \multirow{2}{*}{\footnotesize \scshape \itshape To~Radio \vspace{.7cm}} \\
-        & & \\ \cline{3-3}
-    \end{tabular}
+\tl_new:N \l_qsl_type
+\keys_define:nn {card} {
+    worked .tl_set:N = \l_qsl_target_callsign,
+    date .tl_set:N =  \l_qsl_info_date,
+    time .tl_set:N =  \l_qsl_info_time,
+    freq .tl_set:N =  \l_qsl_info_freq,
+    mode .tl_set:N =  \l_qsl_info_mode,
+    rst .tl_set:N =  \l_qsl_info_rst,
+    trx .tl_set:N =  \l_qsl_info_trx,
+    watts .tl_set:N =  \l_qsl_info_watts,
+    ant .tl_set:N =  \l_qsl_info_ant,
+    type .tl_set:N = \l_qsl_type,
+    type .default:n = {qsl},
 }
 
-\cs_new:Nn \card_part_@qsl_check: {
-    \begin{tabular}{ccccc}
-        {\footnotesize CONFIRMING} & { \footnotesize $\Box$ OUR~QSL} & {\footnotesize  $\Box$ YOUR~RECV~REPORT} &  {\footnotesize \textbf{CQ~zone:\,\g_@cq}}  &  {\footnotesize \textbf{ITU~zone:\,\g_@itu}} \\
-    \end{tabular}
-}
+\DeclareDocumentEnvironment{card}{ s O{} m O{} +b }{
+    \tl_clear:N \l_qsl_type
+    \tl_clear:N \l_qsl_target_callsign
+    \tl_clear:N \l_qsl_info_date
+    \tl_clear:N \l_qsl_info_time
+    \tl_clear:N \l_qsl_info_freq
+    \tl_clear:N \l_qsl_info_mode
+    \tl_clear:N \l_qsl_info_rst
+    \tl_clear:N \l_qsl_info_trx
+    \tl_clear:N \l_qsl_info_watts
+    \tl_clear:N \l_qsl_info_ant
+    \tl_clear:N \l_qsl_type
 
-\cs_new:Nn \card_part_@swl_check: {
-    \begin{tabular}{cccc}
-        {\footnotesize CONFIRMING}  & {\footnotesize  $\Box$ YOUR~RECV~REPORT} &  {\footnotesize \textbf{CQ~zone:\,\g_@cq}}  &  {\footnotesize \textbf{ITU~zone:\,\g_@itu}} \\
-    \end{tabular}
-}
-
-\cs_new:Nn \card_part_@qsl_info: {
-    \begin{tabular}{| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}|}
-        \hline
-        {\footnotesize DATE/日期} & {\footnotesize TIME/时间} & { \small  MHZ/频率 } & {\footnotesize MOD/模式} & {\footnotesize  RST/信号报告} \\ \hline
-        & & & & \\
-        & & & & \\\hline
-        {\footnotesize TRX/设备} & {\footnotesize WATTS/功率} & {\footnotesize ANT/天线} &  \multicolumn{2}{l|}{$\Box$ PSE/请回卡片 } \\ \hline
-        &  &  & \multicolumn{2}{l|}{ $\Box$ TRX~QSL/感谢您的卡片 } \\ \cline{4-5}
-        &  &  & \multicolumn{2}{l|}{ $\Box$  VY~73!/通联愉快！ } \\ \hline
-        \multicolumn{5}{l}{\bfseries QTH:} \\
-        \multicolumn{5}{l}{\bfseries ADD:~\g_@addr} \\
-        \multicolumn{3}{l}{\bfseries \quad PC:~\g_@pc} & \multicolumn{2}{l}{ \bfseries OP:} \\
-    \end{tabular}
-}
-
-\cs_new:Nn \card_part_@swl_info: {
-    \begin{tabular}{| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}| m{22mm}<{\centering}|}
-        \hline
-        {\footnotesize DATE/日期} & {\footnotesize TIME/时间} & { \small  MHZ/频率 } & {\footnotesize MOD/模式} & {\footnotesize  RST/信号报告} \\ \hline
-        & & & & \\
-        & & & & \\\hline
-        {\footnotesize TRX/设备} & {\footnotesize WATTS/功率} & {\footnotesize ANT/天线} & \multicolumn{2}{l|}{\multirow{2}{*}{
-            $\Box$ \parbox{44mm}{TRX~UR~ FOR~LISTENING \vspace{-1.5mm}\\  感谢您的收听} %
-        }} \\ \cline{1-3}
-        &  &  & \multicolumn{2}{l|}{  }  \\ \cline{4-5}
-        &  &  &  \multicolumn{2}{l|}{ $\Box$  VY~73!/通联愉快！ } \\ \hline
-        \multicolumn{5}{l}{\bfseries QTH:} \\
-        \multicolumn{5}{l}{\bfseries ADD:~\g_@addr} \\
-        \multicolumn{3}{l}{\bfseries \quad PC:~\g_@pc} & \multicolumn{1}{l}{ \bfseries OP:} \\
-    \end{tabular}
-}
-
-\cs_new:Nn \card_back_@qsl: {
-    \begin{center}
-        \setlength\tabcolsep{3pt}
-        \card_part_@head:
-        \vskip-10mm
-        \card_part_@callsign: \\
-        \card_part_@qsl_check: \\
-        \card_part_@qsl_info:
-    \end{center}
-}
-
-
-\cs_new:Nn \card_back_@swl: {
-    \begin{center}
-        \setlength\tabcolsep{3pt}
-        \card_part_@head:
-        \vskip-10mm
-        \card_part_@callsign: \\
-        \card_part_@swl_check: \\
-        \card_part_@swl_info:
-    \end{center}
-}
-
-
-\DeclareDocumentEnvironment{back}{ O{qsl} +b }{
-    {#2} \cs:w card_back_@ #1 : \cs_end:
-}{}
-
-\DeclareDocumentEnvironment{card}{ O{} m +b }{ %
-    \newgeometry{left=10mm, right=10mm, top=10mm, bottom=10mm}
-    \clearpage \thispagestyle{empty}
-    \begin{front}[#1]{#2}
-        #3
-    \end{front}
-    \restoregeometry
+    \keys_set:nn { card } {#4}
     \clearpage \thispagestyle{empty}
     \newgeometry{left=4mm, right=4mm, top=4mm, bottom=4mm}
-    \begin{back}[qsl]
-    \end{back}
-    \restoregeometry
-}{}
-
-
-\DeclareDocumentEnvironment{swl}{ O{} m +b }{ %
-    \newgeometry{left=10mm, right=10mm, top=10mm, bottom=10mm}
-    \clearpage \thispagestyle{empty}
-    \begin{front}[#1]{#2}
-        #3
-    \end{front}
-    \restoregeometry
+    \bool_if:nF {#1} {
+        \begin{front}[#2]{#3}
+            #5
+        \end{front}
+    }
     \clearpage \thispagestyle{empty}
     \newgeometry{left=4mm, right=4mm, top=4mm, bottom=4mm}
-    \begin{back}[swl]
-    \end{back}
+    \back
     \restoregeometry
 }{}
 
-\endinput
+
+
+\DeclareDocumentCommand{\de}{}{DE~\g_qsl_callsign_tl}
