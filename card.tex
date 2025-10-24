@@ -10,42 +10,71 @@
 \graphicspath{{./images}}
 \begin{document}
     \setup{
+        % callsign = B9A,
         callsign = BI3TTR,
         cq = 24,
         itu = 44,
         grid = OM44,
+        address = {地址：陕西省西安市西沣路兴隆段266号 \\ 邮编： 710071},
     }
-    \title {中华人民共和国个人业余电台}[Personal~Amateur~Radio~Station~of~P.R.China]
 
-    \begin{card}*[angle=90]{background-4}
-        \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \Huge \bfseries
+    % \customtitle{
+    %     \resizebox{95mm}{!}{\begin{minipage}{105mm} \centering
+    %             {\huge \bfseries \rmfamily  实验性业余无线电信号收听卡}
+    %             {\large \scshape Exp. Amateur Radio Signal Receive Card}
+    %     \end{minipage}}}
+
+    \title{中华人民共和国个人业余电台}[Personal Amateur Radio Station of P.R.China]
+    % \title{实验性业余无线电信号收听卡}[Exp. Amateur Radio Signal Receive Card]
+
+    \begin{card}{background-1}[
+        date={2025年\\10月24日},
+        time={11:22:33\\UTC},
+        type=swl
+    ]
+        \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \huge \bfseries
+        \bidicontour{white}{通联愉快}
+        \vfill
+        \bidicontour{white}{\de}
+    \end{card}
+
+    \begin{card}{background-2}[
+        worked = BY9AA/QRP,
+        date={2025年\\10月24日},
+        time={11:22:33\\UTC}
+    ]
+        \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \huge \bfseries
+        \vfill
+        \bidicontour{white}{\de}
+    \end{card}
+
+    \begin{card}[angle=90]{background-3}[
+        worked = BY9AA/QRP,
+        date={2025年\\10月24日},
+        time={11:22:33\\UTC},
+        type=eyeball
+    ]
+            \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \huge \bfseries
+            \setstretch{1} \vfill \hfill
+            \rotatebox{90}{\vspace{2em}\bidicontour{white}{\de}}
+    \end{card}
+
+
+    \begin{card}[angle=90]{background-4}[
+        worked = BY9AA/QRP,
+        date={2025年\\10月24日},
+        time={11:22:33\\UTC},
+        freq={14.074},
+        watts={5w},
+        mode={ft8},
+        trx={PMR 171},
+        ant={正V},
+        rst={+3},
+        type=qso,
+    ]
+        \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \huge \bfseries
         \setstretch{1} \vfill \hfill
         \rotatebox{90}{\vspace{-2em}\bidicontour{white}{\de}}
     \end{card}
-
-    % \begin{card}{background-1}
-    %     \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \Huge \bfseries
-    %     \bidicontour{white}{通联愉快}
-    %     \vfill
-    %     \bidicontour{white}{\de}
-    % \end{card}
-
-    % \begin{card}{background-2}
-    %     \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \Huge \bfseries
-    %     \vfill
-    %     \bidicontour{white}{\de}
-    % \end{card}
-
-    % \begin{card}[angle=90]{background-3}
-    %         \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \Huge \bfseries
-    %         \setstretch{1} \vfill \hfill
-    %         \rotatebox{90}{\vspace{2em}\bidicontour{white}{\de}}
-    % \end{card}
-
-    % \begin{card}[angle=90]{background-4}
-    %     \bidicontourlength{2pt} \bidicontournumber{300} \kaishu \Huge \bfseries
-    %     \setstretch{1} \vfill \hfill
-    %     \rotatebox{90}{\vspace{-2em}\bidicontour{white}{\de}}
-    % \end{card}
 
 \end{document}
