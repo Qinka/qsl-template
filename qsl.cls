@@ -13,6 +13,7 @@
 \RequirePackage{multirow}
 \RequirePackage{amssymb}
 \RequirePackage{geometry}
+\RequirePackage{setspace}
 
 \usetikzlibrary{shapes.arrows}
 
